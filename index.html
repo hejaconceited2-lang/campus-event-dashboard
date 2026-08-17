@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>校园送 · 万服&amp;配取 事件看板</title><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#f6f8fb;color:#0f172a;font-family:-apple-system,'Segoe UI','Inter','Microsoft YaHei',sans-serif;font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding:36px 22px 80px}
+.hero{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:26px;flex-wrap:wrap;gap:12px}
+.hero h1{font-size:26px;font-weight:800;letter-spacing:-.3px}
+.hero .sub{color:#64748b;font-size:13px;margin-top:4px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:30px}
+.kpi{background:#fff;border-radius:16px;padding:18px 20px;box-shadow:0 1px 2px rgba(2,6,23,.05),0 8px 24px rgba(2,6,23,.06)}
+.kpi .n{font-size:30px;font-weight:800;letter-spacing:-.5px;font-variant-numeric:tabular-nums}
+.kpi .l{color:#64748b;font-size:12px;margin-top:2px}
+.kpi .i{font-size:13px;font-weight:600;color:#475569}
+.trend{background:#fff;border-radius:16px;padding:18px 20px;box-shadow:0 1px 2px rgba(2,6,23,.05),0 8px 24px rgba(2,6,23,.06);margin-bottom:30px}
+.trend h2{font-size:15px;font-weight:700;margin-bottom:14px}
+.bars{display:flex;align-items:flex-end;gap:10px;height:110px;padding:0 4px}
+.bcol{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+.bbar{width:100%;max-width:46px;border-radius:6px 6px 2px 2px;background:linear-gradient(180deg,#818cf8,#4f46e5);min-height:3px;transition:transform .15s}
+.bcol:hover .bbar{transform:scaleY(1.04)}
+.blab{font-size:11px;color:#94a3b8;font-variant-numeric:tabular-nums}
+.legend{display:flex;gap:16px;margin-top:10px;font-size:12px;color:#64748b}
+.dot{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:5px}
+.days{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.day{background:#fff;border-radius:16px;padding:16px 18px;box-shadow:0 1px 2px rgba(2,6,23,.05),0 8px 24px rgba(2,6,23,.06);text-decoration:none;color:inherit;display:block;transition:transform .15s,box-shadow .15s;border:1px solid transparent}
+.day:hover{transform:translateY(-2px);box-shadow:0 4px 8px rgba(2,6,23,.08),0 16px 40px rgba(2,6,23,.1);border-color:#c7d2fe}
+.day .dt{font-size:17px;font-weight:800;display:flex;justify-content:space-between;align-items:center}
+.day .dst{font-size:11px;color:#94a3b8;font-weight:500}
+.day .dm{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.dm .m{background:#f8fafc;border-radius:10px;padding:8px 10px}
+.dm .m b{font-size:18px;display:block;font-variant-numeric:tabular-nums}
+.dm .m span{font-size:11px;color:#64748b}
+.go{margin-top:10px;font-size:13px;font-weight:600;color:#4f46e5}
+.empty{color:#94a3b8;text-align:center;padding:40px}
+footer{color:#94a3b8;font-size:12px;margin-top:26px}
+</style></head>
+<body><div class="wrap">
+<div class="hero">
+  <div>
+    <h1>📊 校园送 · 万服&amp;配取 事件看板</h1>
+    <div class="sub">按日聚合：万服/配取事件 → 商家归村 → 问题定位 · 时间线链路钻取</div>
+  </div>
+</div>
+<div class="kpis">
+  <div class="kpi"><div class="i">看板天数</div><div class="n">1</div><div class="l">已上线日期</div></div>
+  <div class="kpi"><div class="i">万服事件</div><div class="n">34</div><div class="l">被动+人工</div></div>
+  <div class="kpi"><div class="i">纳入四村</div><div class="n">24</div><div class="l">贝岗/北亭/南亭/穗石</div></div>
+  <div class="kpi"><div class="i">配取事件</div><div class="n">0</div><div class="l">取消/退款</div></div>
+  <div class="kpi"><div class="i">时间线订单</div><div class="n">9138</div><div class="l">链路可钻取</div></div>
+</div>
+
+<h2 style="font-size:15px;font-weight:700;margin-bottom:12px">📅 每日看板</h2>
+<div class="days">
+<a class="day" href="看板_2026-08-15.html">
+  <div class="dt">2026-08-15<span class="dst">万服 34 · 纳入 24 · 配取 0 · 时间线 9138</span></div>
+  <div class="dm">
+    <div class="m"><b style="color:#dc2626">34</b><span>万服事件</span></div>
+    <div class="m"><b>24</b><span>纳入四村</span></div>
+    <div class="m"><b>0</b><span>配取事件</span></div>
+    <div class="m"><b>9138</b><span>时间线订单</span></div>
+  </div>
+  <div class="go">进入每日看板 →</div>
+</a></div>
+<footer>数据源：8月/每日 万服·配取 Excel + 商家归类存档 + 油猴抓取时间线 ｜ 生成时间 2026-08-17 08:38</footer>
+</div></body></html>
