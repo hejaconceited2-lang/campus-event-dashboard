@@ -28,7 +28,7 @@ th{background:#f8fafc;color:#475569}
 </style></head><body><div class="wrap">
 <h1>📋 问题订单判定题库（57 例）</h1>
 <div class="sub">目标：为每个场景判定"问题出在哪个环节"。所有判定自动保存，完成后点「导出判定结果」发给我，用于校准环节阈值。</div>
-<div class="progress"><span>已判定 <b id="doneN">0</b>/57</span><button class="btn export" id="exp">导出判定结果</button><button class="btn export" id="copy" style="background:#0d9488">复制结果</button></div>
+<div class="progress"><span>已判定 <b id="doneN">0</b>/57</span><button class="btn export" id="exp">导出判定结果</button><button class="btn export" id="copy" style="background:#0d9488">复制结果</button><button class="btn export" id="submit" style="background:#16a34a">提交到Google表单</button></div>
 <div id="list">
 <div class="case" id="case-0" data-oid="3402257701903817235">
   <h3>案例 1 · <span style="color:#2563eb">嘎嘎好吃东北老饭盒（大学城店）</span></h3>
@@ -1236,6 +1236,28 @@ document.getElementById('copy').onclick = function(){
     document.execCommand('copy'); ta.remove();
     alert('✅ 已复制，可粘贴发送');
   }
+};
+// ---- Google 表单自动提交（方案A）----
+var GF_FORM_ID = '1FAIpQLSd5Ps3KemL6VL_LG2uz77nYW981VzR998OeA75uaOb52Hkjag';
+var GF_ENTRY_ID = '397078397';
+function submitToGF(txt){
+  if (GF_FORM_ID.indexOf('PASTE') >= 0) { alert('⚠️ 表单未配置：请在脚本里填入 FORM_ID 和 ENTRY_ID'); return; }
+  var url = 'https://docs.google.com/forms/d/e/' + GF_FORM_ID + '/formResponse';
+  var body = new URLSearchParams();
+  body.append('entry.' + GF_ENTRY_ID, txt);
+  body.append('fvv', '1');
+  body.append('draftResponse', '[]');
+  body.append('pageHistory', '0');
+  fetch(url, { method: 'POST', mode: 'no-cors', body: body })
+    .then(function(){ alert('✅ 判定结果已提交到 Google 表单！'); })
+    .catch(function(e){ alert('⚠️ 提交失败: ' + e.message + '（可用「复制结果」手动发送）'); });
+}
+document.getElementById('submit').onclick = function(){
+  var out = CASES.map(function(c, i){
+    var a = ans[c.oid] || {};
+    return { case:i+1, oid:c.oid, judgment:a.j||'', note:a.n||'' };
+  });
+  submitToGF(JSON.stringify(out, null, 1));
 };
 refresh();
 </script>
