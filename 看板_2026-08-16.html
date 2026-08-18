@@ -114,7 +114,7 @@ footer { color:#94a3b8; font-size:12px; margin-top:8px; line-height:1.8; }
 <footer>
   口径说明：① 归类规则——四村站点商家归所属村；直送商家匹配后也归四村；A站/海珠校区等其他范围暂不纳入（仅计数）。
   ② 万服事件按 回声事件/进线方(B/C/D端)/履约方式/骑手责任人 四维定位。③ 配取按 取消标签定性 + 经手骑手链定位到人。
-  ④ 时间线来自油猴抓取归档（8/15 三站 2249 单）。生成时间 2026-08-17 09:26
+  ④ 时间线来自油猴抓取归档（8/15 三站 2249 单）。生成时间 2026-08-18 09:33
 </footer>
 </div>
 <div id="modal"><div class="box">
@@ -178,16 +178,18 @@ footer { color:#94a3b8; font-size:12px; margin-top:8px; line-height:1.8; }
     // 环节分段表
     if (d.segs && d.segs.length) {
       html += '<div style="margin:6px 0 10px;padding:10px 12px;border:1px solid #e2e8f0;border-radius:10px;background:#f8fafc">';
-      html += '<div style="font-weight:700;margin-bottom:6px">⏱ 环节耗时（查"哪个环节拖了"）</div>';
+      html += '<div style="font-weight:700;margin-bottom:6px">⏱ 环节耗时（趟次动态阈值）</div>';
       html += '<table style="width:100%;font-size:13px"><thead><tr><th>环节</th><th class="num">耗时</th><th class="num">阈值</th><th>责任人</th><th>状态</th></tr></thead><tbody>';
       d.segs.forEach(function(s){
-        var hot = (d.slowest && s.label===d.slowest.label) ? 'style="background:#fef2f2"' : '';
         var clr = s.slow ? 'style="color:#dc2626;font-weight:700"' : '';
-        html += '<tr '+hot+'><td>'+esc(s.label)+'</td><td class="num" '+clr+'>'+s.minutes+'min</td><td class="num">'+s.threshold+'</td><td>'+esc(s.rider)+'</td><td>'+(s.slow?'<span style="color:#dc2626">⚠️ 超时</span>':'<span style="color:#16a34a">✓</span>')+'</td></tr>';
+        html += '<tr><td>'+esc(s.label)+'</td><td class="num" '+clr+'>'+s.minutes+'min</td><td class="num">'+s.threshold+'</td><td>'+esc(s.rider)+'</td><td>'+(s.slow?'<span style="color:#dc2626">⚠️ 超时</span>':'<span style="color:#16a34a">✓</span>')+'</td></tr>';
       });
       html += '</tbody></table>';
-      if (d.slowest) {
-        html += '<div style="margin-top:8px;padding:8px 10px;background:#fee2e2;color:#b91c1c;border-radius:8px;font-weight:600">🔴 问题环节：'+esc(d.slowest.label)+'（'+d.slowest.minutes+'min / 阈值'+d.slowest.threshold+'）· 责任人：'+esc(d.slowest.rider)+'</div>';
+      if (d.judge) {
+        html += '<div style="margin-top:8px;padding:8px 10px;background:#eef2ff;color:#4338ca;border-radius:8px;font-weight:600">🎯 问题环节：'+esc(d.judge)+'</div>';
+      }
+      if (d.flags && d.flags.length) {
+        html += '<div style="margin-top:6px;font-size:12px;color:#b45309">⚠️ 异常标记：'+d.flags.map(esc).join(' · ')+'</div>';
       }
       html += '</div>';
     }
