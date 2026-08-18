@@ -49,8 +49,8 @@ footer { color:#94a3b8; font-size:12px; margin-top:8px; line-height:1.8; }
 .okmark { color:#16a34a; font-weight:700; }
 .tlbtn { padding:2px 10px; border:1px solid #2563eb; background:#eff6ff; color:#1d4ed8; border-radius:6px; font-size:12px; cursor:pointer; }
 .tlbtn:hover { background:#dbeafe; }
-#modal { display:none; position:fixed; inset:0; background:rgba(15,23,42,.55); z-index:1000; padding:30px 16px; overflow:auto; }
-#modal .box { background:#fff; max-width:860px; margin:0 auto; border-radius:14px; padding:20px 24px; box-shadow:0 10px 40px rgba(0,0,0,.25); }
+#modal { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(15,23,42,.6); z-index:9999; padding:30px 16px; overflow:auto; }
+#modal .box { background:#fff; max-width:860px; margin:0 auto; border-radius:14px; padding:20px 24px; box-shadow:0 10px 40px rgba(0,0,0,.25); max-height:calc(100vh - 60px); overflow:auto; }
 #modal h3 { font-size:17px; margin-bottom:4px; }
 #modal .msub { color:#64748b; font-size:13px; margin-bottom:14px; }
 #modal .close { float:right; border:none; background:#f1f5f9; color:#475569; font-size:15px; padding:4px 12px; border-radius:8px; cursor:pointer; }
@@ -130,7 +130,7 @@ footer { color:#94a3b8; font-size:12px; margin-top:8px; line-height:1.8; }
 <footer>
   口径说明：① 归类规则——四村站点商家归所属村；直送商家匹配后也归四村；A站/海珠校区等其他范围暂不纳入（仅计数）。
   ② 万服事件按 回声事件/进线方(B/C/D端)/履约方式/骑手责任人 四维定位。③ 配取按 取消标签定性 + 经手骑手链定位到人。
-  ④ 时间线来自油猴抓取归档（8/15 三站 2249 单）。生成时间 2026-08-18 14:01
+  ④ 时间线来自油猴抓取归档（8/15 三站 2249 单）。生成时间 2026-08-18 14:08
 </footer>
 </div>
 <div id="modal"><div class="box">
@@ -216,12 +216,14 @@ footer { color:#94a3b8; font-size:12px; margin-top:8px; line-height:1.8; }
     html += '<div class="table-wrap" style="max-height:44vh"><table class="tl-table"><thead><tr><th>环节</th><th>内容</th><th>操作人</th><th>时间</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
     document.getElementById('mtl').innerHTML = html;
     modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
   }
   document.querySelectorAll('.tlbtn').forEach(function(b){
     b.onclick = function(){ showTL(b.getAttribute('data-oid')); };
   });
-  document.getElementById('mclose').onclick = function(){ modal.style.display='none'; };
-  modal.onclick = function(e){ if(e.target===modal) modal.style.display='none'; };
+  function closeModal(){ modal.style.display='none'; document.body.style.overflow=''; }
+  document.getElementById('mclose').onclick = closeModal;
+  modal.onclick = function(e){ if(e.target===modal) closeModal(); };
   document.getElementById('tlbtn2').onclick = function(){
     var oid = document.getElementById('tlq').value.trim();
     if(!oid) return;
