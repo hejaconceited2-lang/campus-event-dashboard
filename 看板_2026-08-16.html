@@ -66,11 +66,27 @@ footer { color:#94a3b8; font-size:12px; margin-top:8px; line-height:1.8; }
 </style></head>
 <body><div class="container">
 <header>
-  <h1>📊 校园送 · 万服&amp;配取 事件看板</h1>
-  <div class="meta">数据日期：2026-08-16 ｜ 数据源：8月/08月16日 · 万服/配取合并整理 ｜ 归类依据：商家归类存档（四村+直送）</div>
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+    <div>
+      <h1>📊 校园送 · 万服&amp;配取 事件看板</h1>
+      <div class="meta">数据日期：2026-08-16 ｜ 数据源：8月/08月16日 · 万服/配取合并整理 ｜ 归类依据：商家归类存档（四村+直送）</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <a href="index.html" style="background:#4f46e5;color:#fff;text-decoration:none;padding:8px 14px;border-radius:10px;font-weight:600;font-size:13px">← 返回总看板</a>
+      <a href="分析_2026-08-16.html" style="background:#0d9488;color:#fff;text-decoration:none;padding:8px 14px;border-radius:10px;font-weight:600;font-size:13px">📈 全量分析 →</a>
+    </div>
+  </div>
 </header>
 
 <div class="kpis"><div class="kpi red"><div class="num">37</div><div class="lab">万服事件总数</div><div class="lab">被动+人工</div></div><div class="kpi blue"><div class="num">31</div><div class="lab">纳入四村</div><div class="lab">忽略(四村外) 6</div></div><div class="kpi violet"><div class="num">15</div><div class="lab">直送商家事件</div><div class="lab">直送归属四村</div></div><div class="kpi amber"><div class="num">0</div><div class="lab">配取事件</div><div class="lab">纳入 0</div></div><div class="kpi teal"><div class="num">0</div><div class="lab">时间线订单</div><div class="lab">8/15 抓取可钻取</div></div></div>
+<div class="kpis"><div class="kpi red"><div class="num">438</div><div class="lab">🔴 需处理</div></div><div class="kpi amber"><div class="num">662</div><div class="lab">🟡 需关注</div></div><div class="kpi gray"><div class="num">0</div><div class="lab">⚪ 观察</div></div></div>
+<div class="panel">
+  <h2>🚨 问题订单全量定义（1100 单 · A缺失/B超时/C异常 · 一单可多问题）</h2>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px">
+    <span style="background:#dc262618;color:#dc2626;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600">A1-取餐段缺失 <b>404</b></span><span style="background:#dc262618;color:#dc2626;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600">A2-送餐段缺失 <b>1</b></span><span style="background:#d9770618;color:#d97706;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600">B1-出餐超时 <b>76</b></span><span style="background:#d9770618;color:#d97706;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600">B2-收餐超时 <b>520</b></span><span style="background:#d9770618;color:#d97706;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600">B3-末端超时 <b>167</b></span><span style="background:#dc262618;color:#dc2626;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600">C1-商家卡餐 <b>33</b></span><span style="background:#64748b18;color:#64748b;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600">C2-压趟 <b>215</b></span><span style="background:#64748b18;color:#64748b;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600">C3-漏录入 <b>379</b></span><span style="background:#64748b18;color:#64748b;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600">C4-客服介入 <b>3</b></span>
+  </div>
+  <div class="legend">分级：🔴需处理(含A缺失/C1卡餐) ｜ 🟡需关注(B/C超时类) ｜ ⚪观察(轻度) ｜ 标识含义见 <a href="分析_2026-08-16.html" style="color:#4f46e5">全量分析页的判定口径说明</a></div>
+</div>
 <div class="villages"><div class="village" style="border-top-color:#2563eb"><div class="vname">贝岗村</div><div class="vcount" style="color:#2563eb">17</div><div class="vtop">TOP: 配送慢(4)、用户反馈未收到餐(2)</div></div><div class="village" style="border-top-color:#0d9488"><div class="vname">北亭村</div><div class="vcount" style="color:#0d9488">12</div><div class="vtop">TOP: 配送慢(3)、未收到货显示已送达(2)</div></div><div class="village" style="border-top-color:#f59e0b"><div class="vname">南亭村</div><div class="vcount" style="color:#f59e0b">1</div><div class="vtop">TOP: 骑手接单不取货(1)</div></div><div class="village" style="border-top-color:#7c3aed"><div class="vname">穗石村</div><div class="vcount" style="color:#7c3aed">1</div><div class="vtop">TOP: 配送慢(1)</div></div></div>
 
 <section class="panel">
@@ -114,7 +130,7 @@ footer { color:#94a3b8; font-size:12px; margin-top:8px; line-height:1.8; }
 <footer>
   口径说明：① 归类规则——四村站点商家归所属村；直送商家匹配后也归四村；A站/海珠校区等其他范围暂不纳入（仅计数）。
   ② 万服事件按 回声事件/进线方(B/C/D端)/履约方式/骑手责任人 四维定位。③ 配取按 取消标签定性 + 经手骑手链定位到人。
-  ④ 时间线来自油猴抓取归档（8/15 三站 2249 单）。生成时间 2026-08-18 11:48
+  ④ 时间线来自油猴抓取归档（8/15 三站 2249 单）。生成时间 2026-08-18 12:05
 </footer>
 </div>
 <div id="modal"><div class="box">
