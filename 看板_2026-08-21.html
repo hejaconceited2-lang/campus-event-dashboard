@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>校园送 · 事件看板 2026-08-21</title><style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#f1f5f9; color:#0f172a; font-family:-apple-system,'Segoe UI','Microsoft YaHei','PingFang SC',sans-serif; font-size:14px; line-height:1.6; }
+.container { max-width:1240px; margin:0 auto; padding:24px 20px 60px; }
+header { margin-bottom:20px; }
+header h1 { font-size:24px; font-weight:700; letter-spacing:.5px; }
+.meta { color:#64748b; font-size:13px; margin-top:4px; }
+.kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px; margin-bottom:22px; }
+.kpi { background:#fff; border-radius:14px; padding:16px 18px; box-shadow:0 1px 3px rgba(15,23,42,.08); border-left:4px solid #2563eb; }
+.kpi .num { font-size:28px; font-weight:700; line-height:1.2; }
+.kpi .lab { color:#64748b; font-size:12px; margin-top:2px; }
+.kpi.blue{border-left-color:#2563eb}.kpi.teal{border-left-color:#0d9488}.kpi.amber{border-left-color:#f59e0b}.kpi.violet{border-left-color:#7c3aed}.kpi.gray{border-left-color:#94a3b8}.kpi.red{border-left-color:#dc2626}
+.villages { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:12px; margin-bottom:22px; }
+.village { background:#fff; border-radius:14px; padding:14px 16px; box-shadow:0 1px 3px rgba(15,23,42,.08); border-top:4px solid #ccc; }
+.village .vname { font-size:15px; font-weight:700; }
+.village .vcount { font-size:22px; font-weight:700; margin:4px 0 6px; }
+.village .vtop { font-size:12px; color:#475569; }
+.panel { background:#fff; border-radius:14px; box-shadow:0 1px 3px rgba(15,23,42,.08); padding:18px 20px; margin-bottom:22px; }
+.panel h2 { font-size:17px; font-weight:700; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+.panel h2 .badge { background:#eef2ff; color:#4338ca; font-size:12px; padding:2px 8px; border-radius:999px; font-weight:600; }
+.grid2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+@media (max-width:900px){ .grid2{grid-template-columns:1fr} }
+.bars { margin-top:6px; }
+.bar-row { display:flex; align-items:center; gap:8px; margin-bottom:7px; font-size:13px; }
+.bar-row .bl { width:170px; text-align:right; color:#334155; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex-shrink:0; }
+.bar-row .bt { flex:1; background:#f1f5f9; border-radius:6px; height:16px; overflow:hidden; }
+.bar-row .bf { height:100%; border-radius:6px; min-width:2px; }
+.bar-row .bn { width:42px; font-weight:600; color:#0f172a; text-align:right; flex-shrink:0; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th,td { padding:7px 10px; text-align:left; border-bottom:1px solid #e2e8f0; white-space:nowrap; }
+th { background:#f8fafc; color:#475569; font-weight:600; cursor:pointer; user-select:none; position:sticky; top:0; }
+th:hover { background:#eef2ff; }
+tr:hover td { background:#f8fafc; }
+.num { text-align:right; }
+.tag { display:inline-block; padding:1px 8px; border-radius:999px; font-size:12px; font-weight:600; }
+.tag.blue{background:#dbeafe;color:#1d4ed8}.tag.teal{background:#ccfbf1;color:#0f766e}.tag.amber{background:#fef3c7;color:#b45309}.tag.violet{background:#ede9fe;color:#6d28d9}.tag.gray{background:#f1f5f9;color:#475569}.tag.red{background:#fee2e2;color:#b91c1c}
+.table-wrap { overflow:auto; max-height:520px; border:1px solid #e2e8f0; border-radius:10px; }
+.toolbar { display:flex; gap:8px; align-items:center; margin-bottom:10px; flex-wrap:wrap; }
+.toolbar input { padding:6px 10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; outline:none; width:220px; }
+.toolbar input:focus { border-color:#2563eb; }
+.fbtn { padding:5px 12px; border:1px solid #cbd5e1; background:#fff; border-radius:8px; font-size:13px; cursor:pointer; }
+.fbtn.on { background:#2563eb; color:#fff; border-color:#2563eb; }
+.empty { padding:24px; text-align:center; color:#94a3b8; font-size:14px; }
+footer { color:#94a3b8; font-size:12px; margin-top:8px; line-height:1.8; }
+.legend { font-size:12px; color:#64748b; margin-top:6px; }
+.okmark { color:#16a34a; font-weight:700; }
+.tlbtn { padding:2px 10px; border:1px solid #2563eb; background:#eff6ff; color:#1d4ed8; border-radius:6px; font-size:12px; cursor:pointer; }
+.tlbtn:hover { background:#dbeafe; }
+#modal { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(15,23,42,.65); z-index:9999; padding:14px; overflow:auto; }
+#modal .box { background:#fff; max-width:1180px; width:100%; margin:0 auto; border-radius:14px; padding:22px 26px; box-shadow:0 10px 40px rgba(0,0,0,.3); }
+#modal h3 { font-size:17px; margin-bottom:4px; }
+#modal .msub { color:#64748b; font-size:13px; margin-bottom:14px; }
+#modal .close { float:right; border:none; background:#f1f5f9; color:#475569; font-size:15px; padding:4px 12px; border-radius:8px; cursor:pointer; }
+.tl-table td { padding:6px 10px; vertical-align:top; }
+.tl-table .op { font-weight:600; color:#1d4ed8; white-space:nowrap; }
+.tl-table .who { color:#475569; font-size:12px; white-space:nowrap; }
+.tl-table .time { color:#94a3b8; font-size:12px; white-space:nowrap; }
+.tl-table .content { color:#334155; }
+.lookup { display:flex; gap:8px; margin:14px 0 6px; }
+.lookup input { flex:1; max-width:340px; padding:6px 10px; border:1px solid #cbd5e1; border-radius:8px; font-size:13px; outline:none; }
+.lookup button { padding:6px 14px; background:#0d9488; color:#fff; border:none; border-radius:8px; font-size:13px; cursor:pointer; }
+.lookup-note { font-size:12px; color:#64748b; margin-top:4px; }
+</style></head>
+<body><div class="container">
+<header>
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+    <div>
+      <h1>📊 校园送 · 万服&amp;配取 事件看板</h1>
+      <div class="meta">数据日期：2026-08-21 ｜ 数据源：8月/08月21日 · 万服/配取合并整理 ｜ 归类依据：商家归类存档（四村+直送）</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <a href="index.html" style="background:#4f46e5;color:#fff;text-decoration:none;padding:8px 14px;border-radius:10px;font-weight:600;font-size:13px">← 返回总看板</a>
+      <a href="分析_2026-08-21.html" style="background:#0d9488;color:#fff;text-decoration:none;padding:8px 14px;border-radius:10px;font-weight:600;font-size:13px">📈 全量分析 →</a>
+    </div>
+  </div>
+</header>
+
+<div class="kpis"><div class="kpi red"><div class="num">0</div><div class="lab">万服事件总数</div><div class="lab">被动+人工</div></div><div class="kpi blue"><div class="num">0</div><div class="lab">纳入四村</div><div class="lab">忽略(四村外) 0</div></div><div class="kpi violet"><div class="num">0</div><div class="lab">直送商家事件</div><div class="lab">直送归属四村</div></div><div class="kpi amber"><div class="num">0</div><div class="lab">配取事件</div><div class="lab">纳入 0</div></div><div class="kpi teal"><div class="num">0</div><div class="lab">时间线订单</div><div class="lab">8/15 抓取可钻取</div></div></div>
+<div class="villages"><div class="village" style="border-top-color:#2563eb"><div class="vname">贝岗村</div><div class="vcount" style="color:#2563eb">0</div><div class="vtop">TOP: —</div></div><div class="village" style="border-top-color:#0d9488"><div class="vname">北亭村</div><div class="vcount" style="color:#0d9488">0</div><div class="vtop">TOP: —</div></div><div class="village" style="border-top-color:#f59e0b"><div class="vname">南亭村</div><div class="vcount" style="color:#f59e0b">0</div><div class="vtop">TOP: —</div></div><div class="village" style="border-top-color:#7c3aed"><div class="vname">穗石村</div><div class="vcount" style="color:#7c3aed">0</div><div class="vtop">TOP: —</div></div></div>
+
+<section class="panel">
+  <h2>① 万服事件分析 <span class="badge">0 条</span></h2>
+  <div class="grid2">
+    <div><h3 style="font-size:14px;margin-bottom:6px">回声事件类型 TOP</h3><div class="empty">无数据</div></div>
+    <div>
+      <h3 style="font-size:14px;margin-bottom:6px">进线方分布</h3><div class="empty">无数据</div>
+      <h3 style="font-size:14px;margin:14px 0 6px">校园履约方式</h3><div class="empty">无数据</div>
+    </div>
+  </div>
+  <h3 style="font-size:14px;margin:16px 0 6px">骑手 × 责任人 TOP（谁的问题最多）</h3>
+  <div class="empty">无数据</div>
+  <h3 style="font-size:14px;margin:16px 0 6px">事件明细（点击表头排序 · 筛选村庄 · 搜索 · 查看链路）</h3>
+  <div class="toolbar">
+    <button class="fbtn on" data-f="全部">全部</button>
+    <button class="fbtn" data-f="贝岗">贝岗</button>
+    <button class="fbtn" data-f="北亭">北亭</button>
+    <button class="fbtn" data-f="南亭">南亭</button>
+    <button class="fbtn" data-f="穗石">穗石</button>
+    <button class="fbtn" data-f="四村外">四村外</button>
+    <input id="q" placeholder="🔍 搜索订单号/商家/骑手/责任人...">
+  </div>
+  <div class="empty">暂无数据</div>
+  <div class="legend">✓ = 已抓到链路时间线；点「查看链路」看该订单完整履约链；归属村=商家归类结果，四村外=暂不纳入统计；同一订单多件万服已合并为一行（事件数列标注）</div>
+  <div class="lookup">
+    <input id="tlq" placeholder="粘贴订单号，查询任意订单的链路时间线（含四村外/A站）">
+    <button id="tlbtn2">查询链路</button>
+  </div>
+  <div class="lookup-note">已加载 2593 单时间线档案（8/15 三站抓取）</div>
+</section>
+
+<section class="panel">
+  <h2>② 配取分析 <span class="badge">0 条</span></h2>
+  <div class="grid2">
+    <div><h3 style="font-size:14px;margin-bottom:6px">取消标签分布</h3><div class="empty">—</div></div>
+    <div><h3 style="font-size:14px;margin-bottom:6px">明细</h3><div class="empty">该日暂无配取数据（等渠道导出后自动填充）</div></div>
+  </div>
+</section>
+
+<footer>
+  口径说明：① 归类规则——四村站点商家归所属村；直送商家匹配后也归四村；A站/海珠校区等其他范围暂不纳入（仅计数）。
+  ② 万服事件按 回声事件/进线方(B/C/D端)/履约方式/骑手责任人 四维定位。③ 配取按 取消标签定性 + 经手骑手链定位到人。
+  ④ 时间线来自油猴抓取归档（8/15 三站 2593 单）。生成时间 2026-08-22 09:15
+</footer>
+</div>
+<div id="modal"><div class="box">
+  <button class="close" id="mclose">✕ 关闭</button>
+  <h3 id="mtitle">订单链路</h3>
+  <div class="msub" id="msub"></div>
+  <div class="table-wrap"><table class="tl-table" id="mtl"></table></div>
+</div></div>
+<script src="时间线数据_2026-08-21.js"></script>
+<script>
+(function(){
+  var q = document.getElementById('q');
+  var fbtns = Array.prototype.slice.call(document.querySelectorAll('.fbtn'));
+  var curF = '全部';
+  function apply(){
+    var kw = (q.value||'').trim();
+    var rows = Array.prototype.slice.call(document.querySelectorAll('tbody tr'));
+    rows.forEach(function(tr){
+      var okF = curF==='全部' || tr.getAttribute('data-v')===curF;
+      var okQ = !kw || tr.textContent.indexOf(kw)>=0;
+      tr.style.display = (okF && okQ) ? '' : 'none';
+    });
+  }
+  fbtns.forEach(function(b){ b.onclick = function(){
+    curF = b.getAttribute('data-f');
+    fbtns.forEach(function(x){ x.classList.remove('on'); });
+    b.classList.add('on');
+    apply();
+  }; });
+  q.addEventListener('input', apply);
+  // 表头排序
+  document.querySelectorAll('th').forEach(function(th){
+    th.onclick = function(){
+      var tbody = th.closest('table').querySelector('tbody');
+      var rows = Array.prototype.slice.call(tbody.querySelectorAll('tr'));
+      var k = th.getAttribute('data-k');
+      var idx = Array.prototype.slice.call(th.parentNode.children).indexOf(th);
+      var asc = th.getAttribute('data-asc') !== '1';
+      rows.sort(function(a,b){
+        var va = a.children[idx] ? a.children[idx].textContent.trim() : '';
+        var vb = b.children[idx] ? b.children[idx].textContent.trim() : '';
+        var na = parseFloat(va), nb = parseFloat(vb);
+        if (!isNaN(na) && !isNaN(nb)) return asc ? na-nb : nb-na;
+        return asc ? va.localeCompare(vb,'zh') : vb.localeCompare(va,'zh');
+      });
+      rows.forEach(function(r){ tbody.appendChild(r); });
+      th.setAttribute('data-asc', asc?'1':'0');
+      apply();
+    };
+  });
+
+  // ---- 链路弹窗 ----
+  var modal = document.getElementById('modal');
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function showTL(oid){
+    var d = (window.TL||{})[oid];
+    if(!d){ alert('该订单暂无链路档案（可能未抓到或订单号格式不同）'); return; }
+    document.getElementById('mtitle').textContent = '订单链路 · ' + oid;
+    document.getElementById('msub').textContent = d.merchant + ' ｜ ' + d.station + (d.expect ? ' ｜ 期望送达 ' + d.expect : '') + (d.total!=null ? ' ｜ 总时长 ' + d.total + 'min' : '');
+    var html = '';
+    // 环节分段表
+    if (d.segs && d.segs.length) {
+      html += '<div style="margin:6px 0 10px;padding:10px 12px;border:1px solid #e2e8f0;border-radius:10px;background:#f8fafc">';
+      html += '<div style="font-weight:700;margin-bottom:6px">⏱ 环节耗时（趟次动态阈值）</div>';
+      html += '<table style="width:100%;font-size:13px"><thead><tr><th>环节</th><th class="num">耗时</th><th class="num">阈值</th><th>责任人</th><th>状态</th></tr></thead><tbody>';
+      d.segs.forEach(function(s){
+        var clr = s.slow ? 'style="color:#dc2626;font-weight:700"' : '';
+        html += '<tr><td>'+esc(s.label)+'</td><td class="num" '+clr+'>'+s.minutes+'min</td><td class="num">'+s.threshold+'</td><td>'+esc(s.rider)+'</td><td>'+(s.slow?'<span style="color:#dc2626">⚠️ 超时</span>':'<span style="color:#16a34a">✓</span>')+'</td></tr>';
+      });
+      html += '</tbody></table>';
+      if (d.judge) {
+        html += '<div style="margin-top:8px;padding:8px 10px;background:#eef2ff;color:#4338ca;border-radius:8px;font-weight:600">🎯 问题环节：'+esc(d.judge)+'</div>';
+      }
+      if (d.flags && d.flags.length) {
+        html += '<div style="margin-top:6px;font-size:12px;color:#b45309">⚠️ 异常标记：'+d.flags.map(esc).join(' · ')+'</div>';
+      }
+      html += '</div>';
+    }
+    // 原始时间线
+    var rows = d.tl.map(function(t){
+      return '<tr><td class="op">'+esc(t[0])+'</td><td class="content">'+esc(t[1])+'</td><td class="who">'+esc(t[2])+'</td><td class="time">'+esc(t[3])+'</td></tr>';
+    }).join('');
+    html += '<div class="table-wrap"><table class="tl-table"><thead><tr><th>环节</th><th>内容</th><th>操作人</th><th>时间</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+    document.getElementById('mtl').innerHTML = html;
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+  }
+  document.querySelectorAll('.tlbtn').forEach(function(b){
+    b.onclick = function(){ showTL(b.getAttribute('data-oid')); };
+  });
+  function closeModal(){ modal.style.display='none'; document.body.style.overflow=''; }
+  document.getElementById('mclose').onclick = closeModal;
+  modal.onclick = function(e){ if(e.target===modal) closeModal(); };
+  document.getElementById('tlbtn2').onclick = function(){
+    var oid = document.getElementById('tlq').value.trim();
+    if(!oid) return;
+    showTL(oid);
+  };
+  document.getElementById('tlq').addEventListener('keydown', function(e){ if(e.key==='Enter') document.getElementById('tlbtn2').click(); });
+})();
+</script>
+</body></html>
