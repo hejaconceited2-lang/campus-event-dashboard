@@ -188,6 +188,7 @@ function fitCat(cat){
   if(bs.length) map.fitBounds(L.latLngBounds(bs).pad(0.3));
 }
 function focusMap(name){
+  name=decodeURIComponent(name);
   switchTab('map');
   var m=D.merchants.filter(function(x){return x.name===name;})[0];
   if(!m||!m.lng){ alert('该商家无地图定位'); return; }
@@ -245,6 +246,7 @@ function renderVisit(){
   };});
 }
 function gotoVisit(name){
+  name=decodeURIComponent(name);
   switchTab('visit');
   var id='card_'+encodeURIComponent(name);
   var el=document.getElementById(id);
