@@ -200,6 +200,7 @@ function fitCat(cat){
 }
 function focusMap(name){
   name=decodeURIComponent(name);
+  var fresh=!mapInit;
   switchTab('map');
   var m=D.merchants.filter(function(x){return x.name===name;})[0];
   if(!m||!m.lng){ alert('该商家无地图定位'); return; }
@@ -209,12 +210,25 @@ function focusMap(name){
     if(!marksMap[name]){ document.getElementById('q').value=''; renderMap(''); }
     var mk=marksMap[name];
     if(!mk){ alert('该商家无地图定位'); return; }
-    // 标记可能聚合在簇里：先 zoomToShowLayer 展开簇让标记可见，再定位并弹卡
-    cluster.zoomToShowLayer(mk, function(){
-      map.setView([m.lat,m.lng],17);
+    // 1) 先定位到商家（无论是否聚合都保证跳转）
+    map.setView([m.lat,m.lng],17);
+    var opened=false;
+    var force=function(){
+      if(opened) return; opened=true;
+      // 若标记仍藏在聚合簇里（同坐标商家簇无法靠放大分开）：
+      // 临时把该标记移出簇、单独加到地图上，再弹卡，保证一定能展开到具体商家
+      var p=mk.__parent;
+      if(p && p._icon && cluster.hasLayer(mk) && !map.hasLayer(mk)){
+        try{ cluster.removeLayer(mk); }catch(e){}
+        try{ map.addLayer(mk); }catch(e){}
+      }
       mk.openPopup();
-    });
-  }, mapInit?80:500);
+    };
+    // 2) 标准展开：zoomToShowLayer 让标记可见（同坐标商家由 markercluster 自动 spiderfy 扇开）
+    cluster.zoomToShowLayer(mk, force);
+    // 3) 兜底：1.1s 后仍未弹出（簇展开卡住）→ 强制移出簇 + 弹卡
+    setTimeout(force, 1100);
+  }, fresh?550:80);
 }
 
 // ---- 走访视图 ----
@@ -362,7 +376,7 @@ document.getElementById('q').addEventListener('input',function(){
   if(document.getElementById('mapView').style.display==='block') renderMap(q); else renderVisit();
 });
 document.getElementById('sub').textContent=D.dates+' · 贝岗商家 '+D.n_active+' 家 · 停业 '+D.n_closed+' 家';
-document.getElementById('ft').textContent='整单超时=送达>预期送达 ｜ 取餐段超时=下单→取餐>20min ｜ 万服=B端进线 ｜ POI=近似定位待核实 ｜ 📌=GPS修正(GCJ02)';
+document.getElementById('ft').textContent='整单超时=送达>预期送达 ｜ 取餐段超时=下单→取餐>20min ｜ 万服=B端进线 ｜ POI=近似定位待核实 ｜ 📌=GPS修正(GCJ02) ｜ v2.2-聚焦弹卡';
 // URL ?m= 直达走访商家
 (function(){
   var p=new URLSearchParams(location.search).get('m');
