@@ -22,6 +22,13 @@ body{background:#f1f5f9;font-family:-apple-system,'PingFang SC','Microsoft YaHei
 .srch{margin:10px 16px 0;display:flex;gap:8px}
 .srch input{flex:1;padding:9px 12px;border-radius:10px;border:1px solid #cbd5e1;font-size:14px;background:#fff}
 .expbtn{margin:10px 16px 0;padding:9px 0;width:100%;border:none;border-radius:10px;background:#0d9488;color:#fff;font-size:13.5px;font-weight:700;cursor:pointer}
+.expbtn.fix{background:#7c3aed}
+.exprow{display:flex;gap:8px;margin:10px 16px 0}
+.exprow .expbtn{flex:1;margin:0}
+.fixrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:4px}
+.fixbtn{padding:6px 12px;border:none;border-radius:8px;background:#7c3aed;color:#fff;font-size:12px;font-weight:600;cursor:pointer}
+.fixbtn.del{background:#e2e8f0;color:#475569}
+.fixstat{font-size:11.5px;color:#7c3aed;font-weight:600}
 .cnt{padding:10px 12px 60px}
 .card{background:#fff;border-radius:12px;margin-bottom:10px;box-shadow:0 1px 3px rgba(2,6,23,.07);overflow:hidden}
 .card summary{list-style:none;padding:12px 14px;display:flex;align-items:center;gap:10px;cursor:pointer}
@@ -89,7 +96,10 @@ th{color:#64748b;font-weight:600}
   <div class="legend"><span><i style="background:#dc2626"></i>整单超时≥30%</span> <span><i style="background:#f59e0b"></i>15-30%</span> <span><i style="background:#22c55e"></i>&lt;15%</span></div>
 </div>
 <div id="visitView">
-  <button class="expbtn" onclick="exportVisit()">📤 导出走访记录（.txt）</button>
+  <div class="exprow">
+    <button class="expbtn" onclick="exportVisit()">📤 走访记录(.txt)</button>
+    <button class="expbtn fix" onclick="exportFixes()">📌 定位修正(.csv)</button>
+  </div>
   <div class="cnt" id="list"></div>
 </div>
 <div class="ft" id="ft"></div>
@@ -227,6 +237,9 @@ function renderVisit(){
        + '<div class="wrap"><table><tr><th>日期</th><th>单量</th><th>整单超时%</th><th>取餐段超时%</th></tr>'+dayRows+'</table></div>'
        + '<h3>📋 B端万服（'+m.wf_list.length+'件 · 点「链路」看订单）</h3>'
        + '<div class="wrap"><table><tr><th>时间</th><th>事件</th><th>骑手</th><th>详情</th></tr>'+wfRows+'</table></div>'
+       + '<h3>📍 定位修正（站店门口点按钮抓 GPS，覆盖原 POI 坐标）</h3>'
+       + '<div class="fixrow"><button class="fixbtn" data-fix="'+fixKey(m.name)+'">📌 抓取当前定位</button>'
+       + '<button class="fixbtn del" data-fixdel="'+fixKey(m.name)+'">清除</button><span class="fixstat" id="fixstat_'+keyOf(m)+'"></span></div>'
        + '<h3>📝 走访记录（自动保存本机）</h3>'
        + '<textarea class="visit" data-k="'+keyOf(m)+'" placeholder="记录走访情况…">'+esc(saved)+'</textarea>'
        + '<div style="margin-top:6px"><button class="vbtn" data-save="'+keyOf(m)+'">保存记录</button>'
@@ -246,6 +259,15 @@ function renderVisit(){
     document.querySelector('textarea[data-k="'+k+'"]').value='';
     b.parentNode.querySelector('.vstat').textContent='已清空';
   };});
+  document.querySelectorAll('[data-fix]').forEach(function(b){b.onclick=function(){
+    var name=b.getAttribute('data-fix').replace('bgfix_','');
+    grabFix(name);
+  };});
+  document.querySelectorAll('[data-fixdel]').forEach(function(b){b.onclick=function(){
+    var name=b.getAttribute('data-fixdel').replace('bgfix_','');
+    if(confirm('清除「'+name+'」的修正坐标？')) clearFix(name);
+  };});
+  renderFixStat();
 }
 function gotoVisit(name){
   name=decodeURIComponent(name);
@@ -254,6 +276,68 @@ function gotoVisit(name){
   var el=document.getElementById(id);
   if(el){ el.open=true; setTimeout(function(){el.scrollIntoView({behavior:'smooth',block:'start'});},60); }
   else { document.getElementById('q').value=name; q=name; renderVisit(); setTimeout(function(){var e2=document.getElementById(id); if(e2){e2.open=true;e2.scrollIntoView({behavior:'smooth'});}},100); }
+}
+// ---- 定位修正：WGS84(GPS) → GCJ02(高德) ----
+var _PI=Math.PI,_A=6378245.0,_EE=0.00669342162296594323;
+function _outChina(lng,lat){return lng<72.004||lng>137.8347||lat<0.8293||lat>55.8271;}
+function _tx(x,y){var r=-100+2*x+3*y+0.2*y*y+0.1*x*y+0.2*Math.sqrt(Math.abs(x));
+  r+=(20*Math.sin(6*x*_PI)+20*Math.sin(2*x*_PI))*2/3;r+=(20*Math.sin(y*_PI)+40*Math.sin(y/3*_PI))*2/3;
+  r+=(160*Math.sin(y/12*_PI)+320*Math.sin(y*_PI/30))*2/3;return r;}
+function _tl(x,y){var r=300+x+2*y+0.1*x*x+0.1*x*y+0.1*Math.sqrt(Math.abs(x));
+  r+=(20*Math.sin(6*x*_PI)+20*Math.sin(2*x*_PI))*2/3;r+=(20*Math.sin(x*_PI)+40*Math.sin(x/3*_PI))*2/3;
+  r+=(150*Math.sin(x/12*_PI)+300*Math.sin(x/30*_PI))*2/3;return r;}
+function wgs2gcj(lng,lat){
+  if(_outChina(lng,lat)) return [lng,lat];
+  var dLat=_tx(lng-105,lat-35),dLng=_tl(lng-105,lat-35);
+  var rl=lat/180*_PI,magic=Math.sin(rl);magic=1-_EE*magic*magic;var sm=Math.sqrt(magic);
+  dLat=(dLat*180)/((_A*(1-_EE))/(magic*sm)*_PI);
+  dLng=(dLng*180)/(_A/sm*Math.cos(rl)*_PI);
+  return [lng+dLng,lat+dLat];
+}
+function fixKey(name){return 'bgfix_'+name;}
+function getFix(name){try{return JSON.parse(localStorage.getItem(fixKey(name))||'null');}catch(e){return null;}}
+function renderFixStat(){
+  document.querySelectorAll('.fixstat').forEach(function(s){
+    var name=s.id.replace('fixstat_bgvisit_','');
+    var f=getFix(name);
+    s.textContent=f?('✓ 已修正 '+f.lat.toFixed(5)+','+f.lng.toFixed(5)+'  @'+f.time+' (±'+f.acc+'m)'):'';
+  });
+}
+function grabFix(name){
+  if(!navigator.geolocation){alert('此浏览器不支持定位（需 HTTPS + 授权）');return;}
+  var btn=document.querySelector('[data-fix="bgfix_'+name+'"]');
+  if(btn){btn.disabled=true;btn.textContent='⏳ 定位中…';}
+  navigator.geolocation.getCurrentPosition(function(pos){
+    var g=wgs2gcj(pos.coords.longitude,pos.coords.latitude);
+    var now=new Date(),p=function(n){return (n<10?'0':'')+n;};
+    var rec={lng:+g[0].toFixed(6),lat:+g[1].toFixed(6),acc:Math.round(pos.coords.accuracy),time:p(now.getMonth()+1)+'-'+p(now.getDate())+' '+p(now.getHours())+':'+p(now.getMinutes())};
+    localStorage.setItem(fixKey(name),JSON.stringify(rec));
+    renderVisit();renderFixStat();
+    alert('✅ 已保存修正坐标\n'+rec.lat+', '+rec.lng+'\n精度 ±'+rec.acc+'m @ '+rec.time+'\n\n可点「📌 定位修正(.csv)」导出');
+  },function(err){
+    var m=err.code===1?'定位权限被拒绝，请在浏览器/系统设置中允许定位':err.code===2?'定位失败（GPS信号弱，请到室外/窗边重试）':'定位超时，请重试';
+    alert('⚠️ '+m);
+    renderVisit();
+  },{enableHighAccuracy:true,timeout:12000,maximumAge:0});
+}
+function clearFix(name){
+  localStorage.removeItem(fixKey(name));
+  renderVisit();
+}
+function exportFixes(){
+  var out=[],cnt=0;
+  for(var i=0;i<localStorage.length;i++){
+    var k=localStorage.key(i);
+    if(k.indexOf('bgfix_')===0){
+      var name=k.replace('bgfix_','');
+      var f=getFix(name);
+      if(f){out.push('【'+name+'】\n修正坐标: '+f.lat+','+f.lng+'（高德GCJ02）\n精度: ±'+f.acc+'m ｜ 时间: '+f.time);cnt++;}
+    }
+  }
+  if(!cnt){alert('暂无定位修正记录');return;}
+  var txt='贝岗村商家定位修正导出（'+new Date().toLocaleString()+'）\n共 '+cnt+' 家\n坐标系: 高德GCJ02（可直接用于地图/定位表）\n\n'+out.join('\n\n');
+  var blob=new Blob(['\ufeff'+txt],{type:'text/plain;charset=utf-8'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='贝岗村定位修正.txt';a.click();
 }
 function exportVisit(){
   var out=[],cnt=0;
@@ -272,7 +356,7 @@ document.getElementById('q').addEventListener('input',function(){
   if(document.getElementById('mapView').style.display==='block') renderMap(q); else renderVisit();
 });
 document.getElementById('sub').textContent=D.dates+' · 贝岗商家 '+D.n_active+' 家 · 停业 '+D.n_closed+' 家';
-document.getElementById('ft').textContent='整单超时=送达>预期送达 ｜ 取餐段超时=下单→取餐>20min ｜ 万服=B端进线 ｜ POI=近似定位待核实';
+document.getElementById('ft').textContent='整单超时=送达>预期送达 ｜ 取餐段超时=下单→取餐>20min ｜ 万服=B端进线 ｜ POI=近似定位待核实 ｜ 📌=GPS修正(GCJ02)';
 // URL ?m= 直达走访商家
 (function(){
   var p=new URLSearchParams(location.search).get('m');
