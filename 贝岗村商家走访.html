@@ -205,8 +205,15 @@ function focusMap(name){
   if(!m||!m.lng){ alert('该商家无地图定位'); return; }
   if(!mapInit) initMap();
   setTimeout(function(){
-    if(marksMap[name]){ map.setView([m.lat,m.lng],17); marksMap[name].openPopup(); }
-    else { renderMap(''); map.setView([m.lat,m.lng],17); if(marksMap[name]) marksMap[name].openPopup(); }
+    // 该商家可能被当前搜索过滤 → 清空搜索并全量重绘，确保标记存在
+    if(!marksMap[name]){ document.getElementById('q').value=''; renderMap(''); }
+    var mk=marksMap[name];
+    if(!mk){ alert('该商家无地图定位'); return; }
+    // 标记可能聚合在簇里：先 zoomToShowLayer 展开簇让标记可见，再定位并弹卡
+    cluster.zoomToShowLayer(mk, function(){
+      map.setView([m.lat,m.lng],17);
+      mk.openPopup();
+    });
   }, mapInit?80:500);
 }
 
