@@ -73,9 +73,17 @@ th{color:#64748b;font-weight:600}
 .dmode{display:flex;gap:4px;background:#eef2ff;border-radius:9px;padding:3px}
 .dmode .dm{padding:5px 10px;border-radius:7px;font-size:12px;font-weight:700;color:#6366f1;cursor:pointer}
 .dmode .dm.on{background:#4f46e5;color:#fff}
-.dchip{padding:5px 10px;border-radius:999px;border:1px solid #cbd5e1;background:#fff;font-size:12px;color:#475569;cursor:pointer;font-weight:600}
-.dchip.on{background:#4f46e5;border-color:#4f46e5;color:#fff}
+.dfold{margin-left:auto;display:flex;align-items:center;gap:5px;background:#fff;border:1.5px solid #4f46e5;border-radius:9px;padding:4px 10px;font-size:12px;font-weight:700;color:#4f46e5;cursor:pointer}
+.dfold .arr{transition:transform .15s;display:inline-block}
+.dfold.open .arr{transform:rotate(180deg)}
+.dpanel{display:none;margin:6px 16px 0;padding:8px 10px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;flex-wrap:wrap;gap:6px}
+.dpanel.open{display:flex}
+.dchip{padding:4px 11px;border-radius:999px;border:1.5px solid #cbd5e1;background:#fff;font-size:12px;color:#64748b;cursor:pointer;font-weight:700}
+.dchip.on{background:#059669;border-color:#059669;color:#fff}
 .dsel{font-size:11px;color:#64748b;margin-left:auto}
+.vday{border:1px solid #e2e8f0;border-radius:10px;padding:8px;margin-top:8px;background:#f8fafc}
+.vday .vdt{font-size:12px;font-weight:700;color:#4f46e5;margin-bottom:4px}
+.vday .visit{min-height:48px;background:#fff}
 </style></head><body>
 <div class="hd">
   <h1>🏘️ 贝岗村商家走访</h1>
@@ -95,9 +103,9 @@ th{color:#64748b;font-weight:600}
       <div class="dm on" id="dmAll" onclick="setMode('all')">📊 整体</div>
       <div class="dm" id="dmOne" onclick="setMode('one')">📅 单日</div>
     </div>
-    <div id="dchips" style="display:flex;gap:6px;flex-wrap:wrap"></div>
-    <span class="dsel" id="dsel"></span>
+    <div class="dfold" id="dfold" onclick="toggleFold()"><span id="dfoldL">📅 全周期</span><span class="arr">▾</span></div>
   </div>
+  <div class="dpanel" id="dpanel"><div id="dchips" style="display:contents"></div></div>
 </div>
 <div class="srch"><input id="q" placeholder="🔍 搜索商家"></div>
 <div id="mapView">
@@ -133,6 +141,10 @@ function selLabel(){
     : n===D.date_list.length?'全周期 '+D.date_list[0]+'~'+D.date_list[D.date_list.length-1]
     : '已选 '+n+' 天';
 }
+function toggleFold(){
+  document.getElementById('dpanel').classList.toggle('open');
+  document.getElementById('dfold').classList.toggle('open');
+}
 function setMode(mode){
   selMode=mode;
   document.getElementById('dmAll').classList.toggle('on', mode==='all');
@@ -141,6 +153,8 @@ function setMode(mode){
     // 单日：只保留第一个已选日
     var first=D.date_list.filter(function(d){return selDays[d];})[0]||D.date_list[0];
     D.date_list.forEach(function(d){selDays[d]=(d===first);});
+    document.getElementById('dpanel').classList.add('open'); // 单日模式自动展开便于选日
+    document.getElementById('dfold').classList.add('open');
   }
   renderChips(); refreshAll();
 }
@@ -158,11 +172,11 @@ function renderChips(){
   D.date_list.forEach(function(d){
     var c=document.createElement('div');
     c.className='dchip'+(selDays[d]?' on':'');
-    c.textContent=d;
+    c.textContent=(selDays[d]?'✓ ':'')+d;
     c.onclick=function(){toggleDay(d);};
     el.appendChild(c);
   });
-  document.getElementById('dsel').textContent=selLabel();
+  document.getElementById('dfoldL').textContent='📅 '+selLabel();
 }
 // 按当前选择聚合商家：返回 {n, w, p, wf}（w/p 用超时单数精确重算，非简单平均）
 function aggOf(m){
@@ -211,6 +225,7 @@ function showTL(ds,oid){
 function closeM(){document.getElementById('modal').style.display='none';}
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function keyOf(m){return 'bgvisit_'+m.name;}
+function visitKey(m,d){return 'bgvisit_'+d+'_'+m.name;} // 按日期隔离的走访记录 key
 
 // ---- tab 切换 ----
 function switchTab(v){
@@ -327,7 +342,37 @@ function renderVisit(){
       ? m.wf_list.filter(function(w){return selDays[w[0].replace('2026-08-','8/')];}).map(function(w){
       return '<tr><td>'+w[0].replace('2026-08-','8/')+'<br>'+w[1]+'</td><td style="text-align:left">'+esc(w[2])+'</td><td>'+w[4]+'</td><td><button class="wfbtn" onclick="showTL(\''+w[0]+'\',\''+w[5]+'\')">链路</button></td></tr>';
     }).join(''):'<tr><td colspan="4" style="color:#94a3b8">所选日期无B端万服</td></tr>';
-    var saved=localStorage.getItem(keyOf(m))||'';
+    // 走访记录：按日期隔离存储。单日=当天一个框；整体=已填写日期各一框（各日独立 key，互不混）
+    var selDates=D.date_list.filter(function(d){return selDays[d];});
+    var recHtml='';
+    if(selMode==='one'){
+      var d0=selDates[0];
+      var k0=visitKey(m,d0);
+      recHtml+='<div class="vday"><div class="vdt">📝 '+d0+' 走访记录</div>'
+        +'<textarea class="visit" data-k="'+k0+'" placeholder="记录 '+d0+' 走访情况…">'+esc(localStorage.getItem(k0)||'')+'</textarea>'
+        +'<div style="margin-top:6px"><button class="vbtn" data-save="'+k0+'">保存记录</button>'
+        +'<button class="vbtn gy" data-clear="'+k0+'">清空</button><span class="vstat"></span></div></div>';
+    } else {
+      // 历史记录（旧版无日期 key，兼容迁移）
+      var oldK=keyOf(m), oldV=localStorage.getItem(oldK);
+      if(oldV&&oldV.trim()){
+        recHtml+='<div class="vday"><div class="vdt">📝 历史记录（迁移前）</div>'
+          +'<textarea class="visit" data-k="'+oldK+'" placeholder="…">'+esc(oldV)+'</textarea>'
+          +'<div style="margin-top:6px"><button class="vbtn" data-save="'+oldK+'">保存记录</button>'
+          +'<button class="vbtn gy" data-clear="'+oldK+'">清空</button><span class="vstat"></span></div></div>';
+      }
+      // 已填写日期各自一框（仅显示有内容的日期，避免空框刷屏）
+      var filledD=selDates.filter(function(d){return (localStorage.getItem(visitKey(m,d))||'').trim();});
+      recHtml+=filledD.map(function(d){
+        var k=visitKey(m,d);
+        return '<div class="vday"><div class="vdt">📝 '+d+' 走访记录</div>'
+          +'<textarea class="visit" data-k="'+k+'" placeholder="…">'+esc(localStorage.getItem(k)||'')+'</textarea>'
+          +'<div style="margin-top:6px"><button class="vbtn" data-save="'+k+'">保存记录</button>'
+          +'<button class="vbtn gy" data-clear="'+k+'">清空</button><span class="vstat"></span></div></div>';
+      }).join('');
+      if(!recHtml) recHtml='<div style="color:#94a3b8;font-size:12px">暂无记录 · 切到📅单日可填写某天走访记录</div>';
+      else recHtml+='<div style="color:#94a3b8;font-size:11px;margin-top:6px">💡 记录按日期分开存储；切到📅单日可新增其他日期记录</div>';
+    }
     h += '<details class="card" id="card_'+encodeURIComponent(m.name)+'"><summary><span class="nm">'+esc(m.name)+'</span>'
        + (m.sd?'<span class="bad sd">🛵自配送</span>':'')
        + (m.src==='poi'?'<span class="bad y">POI</span>':'')
@@ -342,10 +387,8 @@ function renderVisit(){
        + '<h3>📍 定位修正（站店门口点按钮抓 GPS，覆盖原 POI 坐标）</h3>'
        + '<div class="fixrow"><button class="fixbtn" data-fix="'+fixKey(m.name)+'">📌 抓取当前定位</button>'
        + '<button class="fixbtn del" data-fixdel="'+fixKey(m.name)+'">清除</button><span class="fixstat" id="fixstat_'+keyOf(m)+'"></span></div>'
-       + '<h3>📝 走访记录（自动保存本机）</h3>'
-       + '<textarea class="visit" data-k="'+keyOf(m)+'" placeholder="记录走访情况…">'+esc(saved)+'</textarea>'
-       + '<div style="margin-top:6px"><button class="vbtn" data-save="'+keyOf(m)+'">保存记录</button>'
-       + '<button class="vbtn gy" data-clear="'+keyOf(m)+'">清空</button><span class="vstat"></span></div>'
+       + '<h3>📝 走访记录（按日期分开保存）</h3>'
+       + recHtml
        + '</div></details>';
   });
   document.getElementById('list').innerHTML=h || '<div class="empty">无匹配商家</div>';
@@ -445,10 +488,17 @@ function exportVisit(){
   var out=[],cnt=0;
   for(var i=0;i<localStorage.length;i++){
     var k=localStorage.key(i);
-    if(k.indexOf('bgvisit_')===0){var v=localStorage.getItem(k); if(v&&v.trim()){out.push('【'+k.replace('bgvisit_','')+'】\n'+v.trim());cnt++;}}
+    if(k.indexOf('bgvisit_')!==0) continue;
+    var v=localStorage.getItem(k); if(!v||!v.trim()) continue;
+    // key 结构：bgvisit_日期_商家名（新）或 bgvisit_商家名（旧历史）
+    var rest=k.slice('bgvisit_'.length);
+    var date=''; var name=rest;
+    var us=rest.indexOf('_');
+    if(us>0 && rest.slice(0,us).indexOf('/')>=0){ date=rest.slice(0,us); name=rest.slice(us+1); }
+    out.push('【'+name+(date?' · '+date:' · 历史')+'】\n'+v.trim()); cnt++;
   }
   if(!cnt){alert('暂无走访记录');return;}
-  var txt='贝岗村商家走访记录导出（'+new Date().toLocaleString()+'）\n共 '+cnt+' 家\n\n'+out.join('\n\n');
+  var txt='贝岗村商家走访记录导出（'+new Date().toLocaleString()+'）\n共 '+cnt+' 条\n\n'+out.join('\n\n');
   var blob=new Blob(['\ufeff'+txt],{type:'text/plain;charset=utf-8'});
   var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='贝岗村走访记录.txt';a.click();
 }
@@ -457,7 +507,7 @@ document.getElementById('q').addEventListener('input',function(){
   q=this.value.trim();
   if(document.getElementById('mapView').style.display==='block') renderMap(q); else renderVisit();
 });
-document.getElementById('ft').textContent='整单超时=送达>预期送达 ｜ 取餐段超时=下单→取餐>20min ｜ 万服=B端进线 ｜ POI=近似定位待核实 ｜ 📌=GPS修正(GCJ02) ｜ 🛵=自配送商家 ｜ 📅=选天数(整体可多选/单日单选) ｜ v3.0-单日+整体';
+document.getElementById('ft').textContent='整单超时=送达>预期送达 ｜ 取餐段超时=下单→取餐>20min ｜ 万服=B端进线 ｜ POI=近似定位待核实 ｜ 📌=GPS修正(GCJ02) ｜ 🛵=自配送商家 ｜ 📅=选天数(整体多选/单日单选) ｜ 📝记录按日期分开 ｜ v3.1-按日记录';
 // URL ?m= 直达走访商家
 (function(){
   var p=new URLSearchParams(location.search).get('m');
