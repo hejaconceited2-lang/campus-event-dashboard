@@ -1,0 +1,1 @@
+window.DIAG_DETAIL=[{"oid":"3302284480475585212","zone":"直送其他","period":"午高峰","mer":"云饺先生（大学城店）","sym":"正常","syms":["正常"],"seg":"拉餐段","role":"拉线/分餐点","who":"邓大耀","rel_over":null,"over_min":-6.9,"end_min":3.1,"riders":2,"ontime":"是","chain":"邓大耀 → 梁竣喆","wanfu_ev":"","no_arr":0,"has_pick":1,"tl":13}];

@@ -1,0 +1,1 @@
+window.DIAG_DETAIL=[{"oid":"3202278761244338599","zone":"直送其他","period":"午高峰","mer":"云饺先生（大学城店）","sym":"超时","syms":["超时","末端不准时"],"seg":"送餐员段","role":"送餐员","who":"杨俊威","rel_over":null,"over_min":11.2,"end_min":4.3,"riders":2,"ontime":"否","chain":"邓大耀 → 杨俊威","wanfu_ev":"","no_arr":0,"has_pick":1,"tl":14}];

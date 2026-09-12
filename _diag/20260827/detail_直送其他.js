@@ -1,0 +1,1 @@
+window.DIAG_DETAIL=[{"oid":"3402274414245463324","zone":"直送其他","period":"午高峰","mer":"云饺先生（大学城店）","sym":"正常","syms":["正常"],"seg":"取餐员段","role":"取餐员","who":"邓大耀","rel_over":null,"over_min":-21.0,"end_min":2.9,"riders":2,"ontime":"是","chain":"邓大耀 → 赵金荣","wanfu_ev":"","no_arr":0,"has_pick":1,"tl":13}];
