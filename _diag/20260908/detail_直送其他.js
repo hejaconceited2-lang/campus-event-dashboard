@@ -1,0 +1,1 @@
+window.DIAG_DETAIL=[{"oid":"3202291662559418428","zone":"直送其他","period":"早餐","mer":"云饺先生（大学城店）","sym":"正常","syms":["正常"],"seg":"取餐员段","role":"取餐员","who":"何天凤","rel_over":null,"over_min":-9.2,"end_min":5.2,"riders":2,"ontime":"是","chain":"何天凤 → 朱建乐","wanfu_ev":"","no_arr":0,"has_pick":1,"tl":14}];
