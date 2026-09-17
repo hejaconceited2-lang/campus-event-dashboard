@@ -512,7 +512,7 @@ document.getElementById('q').addEventListener('input',function(){
   q=this.value.trim();
   if(document.getElementById('mapView').style.display==='block') renderMap(q); else renderVisit();
 });
-document.getElementById('ft').textContent='整单超时=送达>预期送达 ｜ 取餐段超时=下单→取餐>20min ｜ 万服=B端进线 ｜ POI=近似定位待核实 ｜ 📌=GPS修正(GCJ02) ｜ 🛵=自配送商家 ｜ 📅=选天数(整体多选/单日单选) ｜ 📝记录按日期分开 ｜ v4.1-池子优先';
+document.getElementById('ft').textContent='整单超时=送达>预期送达 ｜ 取餐段超时=下单→取餐>20min ｜ 万服=B端进线 ｜ POI=近似定位待核实 ｜ 📌=GPS修正(GCJ02) ｜ 🛵=自配送商家 ｜ 📅=选天数(整体多选/单日单选) ｜ 📝记录按日期分开 ｜ v4.2-站点过滤';
 // URL ?m= 直达走访商家
 (function(){
   var p=new URLSearchParams(location.search).get('m');
