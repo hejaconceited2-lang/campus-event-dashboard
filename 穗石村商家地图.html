@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>穗石村商家地图</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif}
+#map{position:fixed;inset:0}
+.hd{position:fixed;top:0;left:0;right:0;z-index:1000;background:linear-gradient(180deg,rgba(79,70,229,.95),rgba(79,70,229,.85));color:#fff;padding:12px 14px 8px}
+.hd h1{font-size:17px;font-weight:800}
+.hd .sub{font-size:11.5px;opacity:.85;margin-top:1px}
+.hd input{width:100%;margin-top:8px;padding:8px 12px;border-radius:9px;border:none;font-size:13.5px}
+.lgc{position:fixed;z-index:1000;right:10px;bottom:90px;display:flex;flex-direction:column;gap:4px}
+.lgc .b{padding:6px 10px;border-radius:8px;font-size:11px;font-weight:700;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.2);cursor:pointer;border:1px solid #e2e8f0}
+.pop{min-width:200px}
+.pop h4{font-size:14px;margin-bottom:4px}
+.pop .m{display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:12px;margin:6px 0}
+.pop .m b{display:block;font-size:14px}
+.pop a{display:block;text-align:center;padding:6px;background:#4f46e5;color:#fff;border-radius:8px;text-decoration:none;font-size:12.5px;font-weight:600}
+.legend{position:fixed;left:10px;bottom:12px;z-index:1000;background:#fff;border-radius:9px;padding:6px 10px;font-size:11px;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:3px}
+</style></head><body>
+<div class="hd"><h1>🗺️ 穗石村商家地图</h1><div class="sub" id="sub"></div><input id="q" placeholder="🔍 搜索商家/地址"></div>
+<div class="lgc">
+  <div class="b" onclick="fitAll()">🌐 全部</div>
+  <div class="b" onclick="fitCat('高')">🔴 高</div>
+  <div class="b" onclick="fitCat('中')">🟡 中</div>
+  <div class="b" onclick="fitCat('低')">🟢 低</div>
+</div>
+<div class="legend"><span><i style="background:#dc2626"></i>整单超时≥30%</span> <span><i style="background:#f59e0b"></i>15-30%</span> <span><i style="background:#22c55e"></i>&lt;15%</span></div>
+<div id="map"></div>
+<script>
+var D={"marks": [{"name": "松鼠便利（广州大学城店）", "lng": 113.412659, "lat": 23.048511, "n": 5620, "w": 6.0, "p": 8.4, "wf": 0, "sd": false}, {"name": "皇冠香港叉烧饭", "lng": 113.412659, "lat": 23.048511, "n": 3029, "w": 10.6, "p": 24.6, "wf": 0, "sd": false}, {"name": "噹噹茶餐厅", "lng": 113.409307, "lat": 23.047058, "n": 1152, "w": 13.0, "p": 38.3, "wf": 0, "sd": true}, {"name": "香源斋.黄焖鸡米饭", "lng": 113.408926, "lat": 23.047382, "n": 1116, "w": 10.5, "p": 45.1, "wf": 2, "sd": false}, {"name": "小森食堂（牛肉饭·鳗鱼饭·大学城店）", "lng": 113.408926, "lat": 23.047382, "n": 1038, "w": 19.1, "p": 59.5, "wf": 0, "sd": false}, {"name": "王厨下山·江西小炒·现炒下饭菜（大学城穗石店）", "lng": 113.412659, "lat": 23.048511, "n": 1033, "w": 13.7, "p": 34.5, "wf": 1, "sd": true}, {"name": "正为鸡煲（重庆鸡公煲）", "lng": 113.409307, "lat": 23.047058, "n": 997, "w": 9.1, "p": 40.5, "wf": 0, "sd": true}, {"name": "沙县小吃（穗石店）", "lng": 113.412659, "lat": 23.048511, "n": 891, "w": 11.9, "p": 44.4, "wf": 4, "sd": true}, {"name": "青蓝·海豚烘焙（面包.甜品.茶饮)", "lng": 113.412659, "lat": 23.048511, "n": 731, "w": 6.3, "p": 24.5, "wf": 0, "sd": false}, {"name": "武汉小炒(东门广场店)", "lng": 113.504052, "lat": 22.227288, "n": 728, "w": 6.0, "p": 40.5, "wf": 3, "sd": true}, {"name": "一点兔餐厅（牛肉丼·咖喱饭·穗石店）", "lng": 113.408926, "lat": 23.047382, "n": 467, "w": 16.3, "p": 47.1, "wf": 1, "sd": true}, {"name": "中国兰州拉面（穗石村店）", "lng": 113.409307, "lat": 23.047058, "n": 454, "w": 4.6, "p": 33.5, "wf": 0, "sd": true}, {"name": "居宴·沂蒙山炒鸡（大学城店）", "lng": 113.412659, "lat": 23.048511, "n": 451, "w": 13.3, "p": 59.0, "wf": 3, "sd": true}, {"name": "牛肉饭老鸭粉丝汤（穗石店）", "lng": 113.412659, "lat": 23.048511, "n": 421, "w": 6.4, "p": 40.4, "wf": 1, "sd": false}, {"name": "沙县小吃(穗石村8号楼店)", "lng": 113.408926, "lat": 23.047382, "n": 391, "w": 7.7, "p": 34.0, "wf": 0, "sd": false}, {"name": "川香酸菜鱼（穗石店）", "lng": 113.409307, "lat": 23.047058, "n": 362, "w": 9.7, "p": 46.4, "wf": 0, "sd": true}, {"name": "潮好味汤粉王（穗石店）", "lng": 113.408926, "lat": 23.047382, "n": 282, "w": 10.6, "p": 48.6, "wf": 0, "sd": true}, {"name": "黄蜀郎干锅鸡公煲（华南理工穗石店）", "lng": 113.408926, "lat": 23.047382, "n": 264, "w": 8.0, "p": 45.1, "wf": 0, "sd": true}, {"name": "郴一碗过年杀猪粉(大学城店)", "lng": 113.408926, "lat": 23.047382, "n": 264, "w": 5.3, "p": 51.1, "wf": 0, "sd": false}, {"name": "拾穗者餐厅（贵州特色私房菜）", "lng": 113.410034, "lat": 23.046659, "n": 252, "w": 2.4, "p": 42.1, "wf": 0, "sd": true}, {"name": "哈尔滨东北菜馆铁锅炖(大学城穗石店)", "lng": 113.408926, "lat": 23.047382, "n": 223, "w": 7.2, "p": 15.7, "wf": 0, "sd": false}, {"name": "巨惠到家超市（穗石店）", "lng": 113.412659, "lat": 23.048511, "n": 219, "w": 10.0, "p": 11.4, "wf": 0, "sd": false}, {"name": "原味湘菜", "lng": 113.412659, "lat": 23.048511, "n": 200, "w": 16.5, "p": 63.0, "wf": 0, "sd": true}, {"name": "秦夫子（油泼面，肉夹馍）", "lng": 113.408926, "lat": 23.047382, "n": 198, "w": 4.5, "p": 33.3, "wf": 0, "sd": true}, {"name": "震亚牛肉面（大学城店）", "lng": 113.408713, "lat": 23.047406, "n": 196, "w": 8.7, "p": 32.7, "wf": 0, "sd": true}, {"name": "百味佳·现炒家常菜（穗石店）", "lng": 113.408555, "lat": 23.04943, "n": 180, "w": 5.6, "p": 36.1, "wf": 0, "sd": false}, {"name": "小湘厨（现炒快餐.酸菜鱼.家常小炒）", "lng": 113.408926, "lat": 23.047382, "n": 166, "w": 12.0, "p": 1.8, "wf": 0, "sd": true}, {"name": "和仲味蟹黄烤鸡包饭", "lng": 113.412659, "lat": 23.048511, "n": 161, "w": 13.0, "p": 61.5, "wf": 0, "sd": true}, {"name": "客家风味（腌面）", "lng": 113.408713, "lat": 23.047406, "n": 153, "w": 5.2, "p": 37.3, "wf": 0, "sd": true}, {"name": "书上甜品质千层(大学城店)", "lng": 113.412659, "lat": 23.048511, "n": 150, "w": 10.0, "p": 42.0, "wf": 0, "sd": true}, {"name": "河南美食", "lng": 113.410202, "lat": 23.047901, "n": 146, "w": 13.0, "p": 34.9, "wf": 0, "sd": false}, {"name": "无骨手撕鸡(水煮·烤鱼·大学城店)", "lng": 113.412659, "lat": 23.048511, "n": 146, "w": 17.8, "p": 45.2, "wf": 0, "sd": false}, {"name": "自选快餐·蒸好吃（大学城店）", "lng": 113.411029, "lat": 23.051575, "n": 145, "w": 11.7, "p": 73.8, "wf": 1, "sd": false}, {"name": "秘制猪脚饭", "lng": 113.411029, "lat": 23.051575, "n": 128, "w": 11.7, "p": 68.8, "wf": 0, "sd": true}, {"name": "kapaw泰式打抛饭（广州大学城店）", "lng": 113.412659, "lat": 23.048511, "n": 119, "w": 14.3, "p": 28.6, "wf": 0, "sd": true}, {"name": "湘香乐·现炒快餐(大学城店)", "lng": 113.408555, "lat": 23.04943, "n": 117, "w": 12.8, "p": 57.3, "wf": 0, "sd": true}, {"name": "襄阳牛肉面.大块牛肉饭（华南理工穗石店）", "lng": 113.408926, "lat": 23.047382, "n": 108, "w": 13.9, "p": 59.3, "wf": 0, "sd": false}, {"name": "潮汕卤肉饭·冰室", "lng": 113.408926, "lat": 23.047382, "n": 107, "w": 20.6, "p": 47.7, "wf": 1, "sd": false}, {"name": "功夫小茗", "lng": 113.408926, "lat": 23.047382, "n": 102, "w": 13.7, "p": 30.4, "wf": 0, "sd": false}, {"name": "罗记·隆江猪脚饭（烧腊饭）", "lng": 113.408713, "lat": 23.047406, "n": 95, "w": 12.6, "p": 45.3, "wf": 0, "sd": false}, {"name": "回味香｜家常小炒", "lng": 113.409307, "lat": 23.047058, "n": 80, "w": 21.2, "p": 41.2, "wf": 0, "sd": true}, {"name": "三只鹿手制甜点", "lng": 113.409307, "lat": 23.047058, "n": 74, "w": 8.1, "p": 21.6, "wf": 0, "sd": true}, {"name": "有時一卷（川式酸辣粉·简餐快餐）", "lng": 113.410034, "lat": 23.046659, "n": 68, "w": 50.0, "p": 41.2, "wf": 0, "sd": false}, {"name": "食里香面馆（东北老式麻辣烫.大学城店）", "lng": 113.408926, "lat": 23.047382, "n": 61, "w": 19.7, "p": 55.7, "wf": 0, "sd": false}, {"name": "重庆特色面庄（穗石广场店）", "lng": 113.408926, "lat": 23.047382, "n": 55, "w": 21.8, "p": 43.6, "wf": 0, "sd": false}, {"name": "顾三样·老广味（穗石店）", "lng": 113.408926, "lat": 23.047382, "n": 55, "w": 23.6, "p": 65.5, "wf": 0, "sd": false}, {"name": "潮蹄猪脚饭(五谷杂粮渔粉)", "lng": 113.412659, "lat": 23.048511, "n": 49, "w": 12.2, "p": 34.7, "wf": 0, "sd": false}, {"name": "拌壹桶干拌冒菜（大学城穗石店）", "lng": 113.408926, "lat": 23.047382, "n": 48, "w": 16.7, "p": 43.8, "wf": 0, "sd": false}, {"name": "黔香味·贵州辣子鸡·麻辣猪蹄（大学城店）", "lng": 113.410171, "lat": 23.046599, "n": 40, "w": 22.5, "p": 72.5, "wf": 0, "sd": true}, {"name": "潮汕牛肉饭（大学城店）", "lng": 113.4086, "lat": 23.047969, "n": 31, "w": 35.5, "p": 61.3, "wf": 0, "sd": true}, {"name": "巡味十里牛(穗石店)", "lng": 113.412659, "lat": 23.048511, "n": 31, "w": 58.1, "p": 71.0, "wf": 0, "sd": false}, {"name": "老字号隆江猪脚饭", "lng": 113.408926, "lat": 23.047382, "n": 27, "w": 18.5, "p": 33.3, "wf": 0, "sd": true}, {"name": "九记八方·糖水·甜品（长洲店）", "lng": 113.428131, "lat": 23.079292, "n": 26, "w": 15.4, "p": 11.5, "wf": 0, "sd": false}, {"name": "和膳寰餐饮", "lng": 113.410034, "lat": 23.046659, "n": 22, "w": 13.6, "p": 59.1, "wf": 0, "sd": true}, {"name": "海豚烘焙（面包.甜品.茶饮)", "lng": 113.412659, "lat": 23.048511, "n": 20, "w": 5.0, "p": 10.0, "wf": 0, "sd": true}, {"name": "酸得乐无骨酸菜鱼·烤鱼（大学城店）", "lng": 113.408926, "lat": 23.047382, "n": 19, "w": 47.4, "p": 47.4, "wf": 0, "sd": false}, {"name": "老鸭粉丝汤（穗石店）", "lng": 113.412659, "lat": 23.048511, "n": 11, "w": 18.2, "p": 27.3, "wf": 0, "sd": true}, {"name": "大学城驿站（冷饮·炸鸡）", "lng": 113.412659, "lat": 23.048511, "n": 11, "w": 18.2, "p": 81.8, "wf": 0, "sd": false}, {"name": "湘&潮", "lng": 113.411102, "lat": 23.051603, "n": 8, "w": 50.0, "p": 12.5, "wf": 0, "sd": false}, {"name": "化州清汤牛杂(穗石店)", "lng": 113.412659, "lat": 23.048511, "n": 3, "w": 66.7, "p": 0.0, "wf": 0, "sd": true}, {"name": "粥之味", "lng": 113.410034, "lat": 23.046659, "n": 2, "w": 0.0, "p": 0.0, "wf": 0, "sd": false}, {"name": "今喜手作糖水", "lng": 113.408555, "lat": 23.04943, "n": 2, "w": 0.0, "p": 0.0, "wf": 0, "sd": false}, {"name": "普宁海鲜肠粉", "lng": 113.431235, "lat": 23.083693, "n": 1, "w": 0.0, "p": 0.0, "wf": 0, "sd": false}], "n": 63, "n_order": 23746, "dates": "8/15-9/17", "n_sd": 31};
+var map=L.map('map',{zoomControl:false}).setView([23.0616,113.392],14);
+L.tileLayer('https://webrd0{s}.is.autonavi.com/appmaptile?style=7&x={x}&y={y}&z={z}',{subdomains:['1','2','3','4'],maxZoom:18,attribution:'高德'}).addTo(map);
+function colorOf(w){return w>=30?'#dc2626':w>=15?'#f59e0b':'#22c55e';}
+function catOf(w){return w>=30?'高':w>=15?'中':'低';}
+var layer=L.layerGroup().addTo(map);
+function render(kw){
+  layer.clearLayers();
+  D.marks.forEach(function(m){
+    if(kw && m.name.indexOf(kw)<0) return;
+    var c=colorOf(m.w);
+    var mk=L.circleMarker([m.lat,m.lng],{radius:7,color:'#fff',weight:1.5,fillColor:c,fillOpacity:.9}).addTo(layer);
+    mk.bindPopup(
+      '<div class="pop"><h4>'+m.name+(m.sd?' 🛵自配送':'')+'</h4>'
+      +'<div class="m"><div><b>'+m.n+'</b>单量</div><div><b>'+m.w+'%</b>整单超时</div><div><b>'+m.p+'%</b>取餐段超时</div><div><b>'+m.wf+'</b>B端万服</div></div>'
+      +'<a href="穗石村商家走访.html?m='+encodeURIComponent(m.name)+'">📝 去走访页记录 →</a></div>');
+  });
+}
+function fitAll(){map.fitBounds(layer.getBounds().pad(0.15));}
+function fitCat(cat){
+  var bs=[];
+  layer.eachLayer(function(l){ if(l.getPopup&&l.getPopup()&&catOf((l.getPopup().getContent()||'').match(/<b>([\d.]+)%<\/b>整单/)[1])===cat) bs.push(l.getLatLng()); });
+  if(bs.length) map.fitBounds(L.latLngBounds(bs).pad(0.3));
+}
+document.getElementById('q').addEventListener('input',function(){render(this.value.trim());});
+document.getElementById('sub').textContent='穗石村 '+D.n+' 家商家 · '+D.n_order+' 单（'+D.dates+'）· 点标记查看 · 🛵自配送 '+D.n_sd+' 家';
+render();
+fitAll();
+setTimeout(function(){map.invalidateSize();},200);
+</script></body></html>
